@@ -18,6 +18,21 @@ func (d *Differ) diffMap(path []string, a, b reflect.Value) error {
 		return d.mapValues(DELETE, path, a)
 	}
 
+	if len(d.MapIdentifierKey) > 0 {
+		// check for id-key
+		idVal := reflect.ValueOf(d.MapIdentifierKey)
+		aId := a.MapIndex(idVal)
+		bId := b.MapIndex(idVal)
+		if aId.IsValid() && bId.IsValid() {
+			// if the identifiers fo not match, add a delete a and create b to the changelog
+			if aId.Interface() != bId.Interface() {
+				d.cl.add(DELETE, path, a.Interface(), nil)
+				d.cl.add(CREATE, path, nil, b.Interface())
+				return nil
+			}
+		}
+	}
+
 	c := NewComparativeList()
 
 	for _, k := range a.MapKeys() {

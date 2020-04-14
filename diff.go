@@ -32,6 +32,7 @@ const (
 type Differ struct {
 	SliceOrdering       bool
 	DisableStructValues bool
+	MapIdentifierKey    string
 	cl                  Changelog
 }
 
