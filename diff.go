@@ -156,10 +156,17 @@ func tagName(f reflect.StructField) string {
 
 func (d *Differ) identifier(v reflect.Value) interface{} {
 	elem := getFinalValue(v)
+	if !elem.IsValid() {
+		return nil
+	}
 	switch elem.Kind() {
 	case reflect.Map:
 		if len(d.MapIdentifierKey) > 0 {
-			return elem.MapIndex(reflect.ValueOf(d.MapIdentifierKey))
+			mapId := elem.MapIndex(reflect.ValueOf(d.MapIdentifierKey))
+			if !mapId.IsValid() {
+				return nil
+			}
+			return mapId.Interface()
 		}
 	default:
 		for i := 0; i < v.NumField(); i++ {
