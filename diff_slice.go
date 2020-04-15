@@ -27,6 +27,14 @@ func (d *Differ) diffSlice(path []string, a, b reflect.Value) error {
 		return d.diffSliceComparative(path, a, b)
 	}
 
+	if a.Len() > 0 {
+		elem := a.Index(0)
+		if getFinalValue(elem).Kind() == reflect.Map && d.identifier(elem) != nil {
+			// use hashMap implementation
+			return d.diffSliceHashed(path, a, b)
+		}
+	}
+
 	return d.diffSliceGeneric(path, a, b)
 }
 
@@ -59,9 +67,46 @@ func (d *Differ) diffSliceGeneric(path []string, a, b reflect.Value) error {
 	return d.diffComparative(path, missing)
 }
 
+func (d *Differ) diffSliceHashed(path []string, a, b reflect.Value) error {
+	missing := NewComparativeList()
+	mapA := map[interface{}]bool{}
+	mapB := map[interface{}]bool{}
+	// fill mapB
+	for i := 0; i < b.Len(); i++ {
+		be := b.Index(i)
+		mapB[d.identifier(be)] = true
+	}
+
+	for i := 0; i < a.Len(); i++ {
+		ae := a.Index(i)
+		// fill mapA
+		mapA[d.identifier(ae)] = true
+
+		_, isInB := mapB[d.identifier(ae)]
+		if (d.SliceOrdering && !hasAtSameIndex(b, ae, i)) || (!d.SliceOrdering && !isInB) {
+			missing.addA(i, &ae)
+		}
+	}
+
+	for i := 0; i < b.Len(); i++ {
+		be := b.Index(i)
+
+		_, isInA := mapA[d.identifier(be)]
+		if (d.SliceOrdering && !hasAtSameIndex(a, be, i)) || (!d.SliceOrdering && !isInA) {
+			missing.addB(i, &be)
+		}
+	}
+
+	// fallback to comparing based on order in slice if item is missing
+	if len(missing.keys) == 0 {
+		return nil
+	}
+
+	return d.diffComparative(path, missing)
+}
+
 func (d *Differ) diffSliceComparative(path []string, a, b reflect.Value) error {
 	c := NewComparativeList()
-
 	for i := 0; i < a.Len(); i++ {
 		ae := a.Index(i)
 		ak := getFinalValue(ae)
