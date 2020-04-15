@@ -65,7 +65,7 @@ func ExampleDiff() {
 	// Produces: diff.Changelog{diff.Change{Type:"update", Path:[]string{"id"}, From:1, To:2}, diff.Change{Type:"update", Path:[]string{"name"}, From:"Green Apple", To:"Red Apple"}, diff.Change{Type:"create", Path:[]string{"nutrients", "2"}, From:interface {}(nil), To:"vitamin e"}, diff.Change{Type:"create", Path:[]string{"tags", "popularity"}, From:interface {}(nil), To:main.Tag{Name:"popularity", Value:"high"}}}
 }
 
-func TestMap(t *testing.T) {
+func TestMapKey(t *testing.T) {
 	d, _ := NewDiffer(SetMapIdentifier("mapId"))
 	old := []map[string]interface{}{
 		{
@@ -89,6 +89,46 @@ func TestMap(t *testing.T) {
 			"mapId": 3,
 			"key1":  "value111",
 			"key2":  "value222",
+		},
+	}
+	changelog, err := d.Diff(old, new)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	fmt.Printf("%#v", changelog)
+	t.Fail()
+}
+
+func TestMapOrder(t *testing.T) {
+	d, _ := NewDiffer(SetMapIdentifier("mapId"))
+	old := []map[string]interface{}{
+		{
+			"mapId": 1,
+			"key1":  "value1",
+			"key2":  "value2",
+		},
+		{
+			"mapId": 2,
+			"key1":  "value11",
+			"key2":  "value22",
+		},
+		{
+			"mapId": 3,
+			"key1":  "value111",
+			"key2":  "value222",
+		},
+	}
+	new := []map[string]interface{}{
+		{
+			"mapId": 2,
+			"key1":  "value11",
+			"key2":  "value22",
+		},
+		{
+			"mapId": 1,
+			"key1":  "value1",
+			"key2":  "value2",
 		},
 	}
 	changelog, err := d.Diff(old, new)

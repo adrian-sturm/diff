@@ -154,13 +154,20 @@ func tagName(f reflect.StructField) string {
 	return parts[0]
 }
 
-func identifier(v reflect.Value) interface{} {
-	for i := 0; i < v.NumField(); i++ {
-		if hasTagOption(v.Type().Field(i), "identifier") {
-			return v.Field(i).Interface()
+func (d *Differ) identifier(v reflect.Value) interface{} {
+	elem := getFinalValue(v)
+	switch elem.Kind() {
+	case reflect.Map:
+		if len(d.MapIdentifierKey) > 0 {
+			return elem.MapIndex(reflect.ValueOf(d.MapIdentifierKey))
+		}
+	default:
+		for i := 0; i < v.NumField(); i++ {
+			if hasTagOption(v.Type().Field(i), "identifier") {
+				return v.Field(i).Interface()
+			}
 		}
 	}
-
 	return nil
 }
 

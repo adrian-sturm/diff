@@ -24,10 +24,9 @@ func (d *Differ) diffMap(path []string, a, b reflect.Value) error {
 		aId := a.MapIndex(idVal)
 		bId := b.MapIndex(idVal)
 		if aId.IsValid() && bId.IsValid() {
-			// if the identifiers fo not match, add a delete a and create b to the changelog
+			// if the identifiers do not match, add "update at path from a to b" to the changelog
 			if aId.Interface() != bId.Interface() {
-				d.cl.add(DELETE, path, a.Interface(), nil)
-				d.cl.add(CREATE, path, nil, b.Interface())
+				d.cl.add(UPDATE, path, a.Interface(), b.Interface())
 				return nil
 			}
 		}
