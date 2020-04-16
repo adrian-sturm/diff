@@ -20,7 +20,7 @@ func (d *Differ) diffUint(path []string, a, b reflect.Value) error {
 	}
 
 	if a.Kind() != b.Kind() {
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), b.Kind())
 	}
 
 	if a.Uint() != b.Uint() {

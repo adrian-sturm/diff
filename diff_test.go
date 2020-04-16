@@ -5,6 +5,7 @@
 package diff
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -310,7 +311,7 @@ func TestDiff(t *testing.T) {
 		{
 			"mismatched-values-struct-map", map[string]string{"test": "one"}, &tstruct{Identifiables: []tistruct{{"one", 1}}},
 			Changelog{},
-			ErrTypeMismatch,
+			NewTypeMismatchError([]string{}, reflect.Map, reflect.Ptr),
 		},
 		{
 			"omittable", tstruct{Ignored: false}, tstruct{Ignored: true},

@@ -18,7 +18,7 @@ func (d *Differ) diffString(path []string, a, b reflect.Value) error {
 	}
 
 	if a.Kind() != b.Kind() {
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), b.Kind())
 	}
 
 	if a.String() != b.String() {

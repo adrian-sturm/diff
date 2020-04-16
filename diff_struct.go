@@ -68,7 +68,7 @@ func (d *Differ) structValues(t string, path []string, a reflect.Value) error {
 	}
 
 	if a.Kind() != reflect.Struct {
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), reflect.Struct)
 	}
 
 	x := reflect.New(a.Type()).Elem()

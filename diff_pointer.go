@@ -22,7 +22,7 @@ func (d *Differ) diffPtr(path []string, a, b reflect.Value) error {
 			}
 		}
 
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), b.Kind())
 	}
 
 	if a.IsNil() && b.IsNil() {

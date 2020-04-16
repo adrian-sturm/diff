@@ -57,7 +57,7 @@ func (d *Differ) mapValues(t string, path []string, a reflect.Value) error {
 	}
 
 	if a.Kind() != reflect.Map {
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), reflect.Map)
 	}
 
 	x := reflect.New(a.Type()).Elem()

@@ -19,6 +19,10 @@ var (
 	ErrInvalidChangeType = errors.New("change type must be one of 'create' or 'delete'")
 )
 
+func NewTypeMismatchError(path []string, t1, t2 interface{}) error {
+	return fmt.Errorf("Types do not match: Path=%v, Type1=%v, Type2=%v", path, t1, t2)
+}
+
 const (
 	// CREATE represents when an element has been added
 	CREATE = "create"
@@ -105,7 +109,7 @@ func (d *Differ) Diff(a, b interface{}) (Changelog, error) {
 func (d *Differ) diff(path []string, a, b reflect.Value) error {
 	// check if types match or are
 	if invalid(a, b) {
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), b.Kind())
 	}
 
 	switch {

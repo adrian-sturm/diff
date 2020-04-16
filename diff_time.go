@@ -21,7 +21,7 @@ func (d *Differ) diffTime(path []string, a, b reflect.Value) error {
 	}
 
 	if a.Kind() != b.Kind() {
-		return ErrTypeMismatch
+		return NewTypeMismatchError(path, a.Kind(), b.Kind())
 	}
 
 	// Marshal and unmarshal time type will lose accuracy. Using unix nano to compare time type.
