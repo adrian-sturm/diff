@@ -43,7 +43,7 @@ func (d *Differ) diffSliceGeneric(path []string, a, b reflect.Value) error {
 
 	slice := sliceTracker{}
 	for i := 0; i < a.Len(); i++ {
-		ae := a.Index(i)
+		ae := getFinalValue(a.Index(i))
 
 		if (d.SliceOrdering && !hasAtSameIndex(b, ae, i)) || (!d.SliceOrdering && !slice.has(b, ae)) {
 			missing.addA(i, &ae)
@@ -52,7 +52,7 @@ func (d *Differ) diffSliceGeneric(path []string, a, b reflect.Value) error {
 
 	slice = sliceTracker{}
 	for i := 0; i < b.Len(); i++ {
-		be := b.Index(i)
+		be := getFinalValue(b.Index(i))
 
 		if (d.SliceOrdering && !hasAtSameIndex(a, be, i)) || (!d.SliceOrdering && !slice.has(a, be)) {
 			missing.addB(i, &be)
@@ -73,12 +73,12 @@ func (d *Differ) diffSliceHashed(path []string, a, b reflect.Value) error {
 	mapB := map[interface{}]bool{}
 	// fill mapB
 	for i := 0; i < b.Len(); i++ {
-		be := b.Index(i)
+		be := getFinalValue(b.Index(i))
 		mapB[d.identifier(be)] = true
 	}
 
 	for i := 0; i < a.Len(); i++ {
-		ae := a.Index(i)
+		ae := getFinalValue(a.Index(i))
 		// fill mapA
 		mapA[d.identifier(ae)] = true
 
@@ -89,7 +89,7 @@ func (d *Differ) diffSliceHashed(path []string, a, b reflect.Value) error {
 	}
 
 	for i := 0; i < b.Len(); i++ {
-		be := b.Index(i)
+		be := getFinalValue(b.Index(i))
 
 		_, isInA := mapA[d.identifier(be)]
 		if (d.SliceOrdering && !hasAtSameIndex(a, be, i)) || (!d.SliceOrdering && !isInA) {
